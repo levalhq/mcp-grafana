@@ -6,7 +6,7 @@ Complete TypeScript/JavaScript implementation of the Model Context Protocol (MCP
 [![npm downloads](https://img.shields.io/npm/dm/@leval/mcp-grafana.svg)](https://www.npmjs.com/package/@leval/mcp-grafana)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![MCP](https://img.shields.io/badge/MCP-1.0-green.svg)](https://modelcontextprotocol.io)
-[![GitHub stars](https://img.shields.io/github/stars/leval-ai/mcp-grafana.svg)](https://github.com/leval-ai/mcp-grafana/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/levalhq/mcp-grafana.svg)](https://github.com/levalhq/mcp-grafana/stargazers)
 
 ## 🚀 Features
 
@@ -31,7 +31,7 @@ npx @leval/mcp-grafana
 
 ### Option 3: Local Development
 ```bash
-git clone https://github.com/leval-ai/mcp-grafana.git
+git clone https://github.com/levalhq/mcp-grafana.git
 cd mcp-grafana
 npm install
 npm run build
@@ -353,7 +353,7 @@ npx @leval/mcp-grafana --debug
 ### Run Test Suite
 ```bash
 # Clone the repository
-git clone https://github.com/leval-ai/mcp-grafana.git
+git clone https://github.com/levalhq/mcp-grafana.git
 cd mcp-grafana
 
 # Install dependencies
@@ -445,7 +445,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ```bash
 # Fork and clone
-git clone https://github.com/leval-ai/mcp-grafana.git
+git clone https://github.com/levalhq/mcp-grafana.git
 cd mcp-grafana
 
 # Install dependencies
@@ -498,7 +498,7 @@ npm info @leval/mcp-grafana
 ## 🆘 Support
 
 - **NPM Package**: [npmjs.com/package/@leval/mcp-grafana](https://www.npmjs.com/package/@leval/mcp-grafana)
-- **GitHub Issues**: [github.com/leval-ai/mcp-grafana/issues](https://github.com/leval-ai/mcp-grafana/issues)
+- **GitHub Issues**: [github.com/levalhq/mcp-grafana/issues](https://github.com/levalhq/mcp-grafana/issues)
 - **Documentation**: [Grafana Docs](https://grafana.com/docs)
 - **MCP Protocol**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 
@@ -506,12 +506,5 @@ npm info @leval/mcp-grafana
 
 This TypeScript implementation provides full feature parity with the original Go version, with improved npm ecosystem integration and support for all major MCP clients.
 
-## 👥 Author
-
-**Leval AI** - [@leval-ai](https://github.com/leval-ai)
-
-Published as npm package: [`@leval/mcp-grafana`](https://www.npmjs.com/package/@leval/mcp-grafana)
-
----
 
 **Made with ❤️ for the Grafana and AI community**

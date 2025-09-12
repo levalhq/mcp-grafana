@@ -165,8 +165,8 @@ jobs:
             ${{ steps.changelog.outputs.changelog }}
             
             ### 📚 Documentation
-            - [Setup Guide](https://github.com/leval-ai/mcp-grafana#-mcp-client-configuration)
-            - [Available Tools](https://github.com/leval-ai/mcp-grafana#-available-tools-43-total)
+            - [Setup Guide](https://github.com/levalhq/mcp-grafana#-mcp-client-configuration)
+            - [Available Tools](https://github.com/levalhq/mcp-grafana#-available-tools-43-total)
             - [npm Package](https://www.npmjs.com/package/@leval/mcp-grafana)
           files: |
             leval-mcp-grafana-*.tgz
