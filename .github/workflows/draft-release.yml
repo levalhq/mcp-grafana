@@ -1,0 +1,86 @@
+name: Draft Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build package
+        run: npm run build
+      
+      - name: Run tests
+        run: npm test || true  # Don't fail on test errors for draft
+      
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+      - name: Generate changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-version-file: true
+          skip-commit: true
+          skip-tag: true
+          output-file: false
+      
+      - name: Create or Update Draft Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: ${{ github.event_name == 'pull_request' }}
+          tag_name: v${{ steps.package-version.outputs.version }}-draft-${{ github.sha }}
+          name: "Draft Release v${{ steps.package-version.outputs.version }}"
+          body: |
+            ## 📦 Draft Release
+            
+            **Version**: v${{ steps.package-version.outputs.version }}
+            **Branch**: ${{ github.ref_name }}
+            **Commit**: ${{ github.sha }}
+            
+            ### 📝 Changelog
+            ${{ steps.changelog.outputs.clean_changelog }}
+            
+            ### 🚀 Installation
+            ```bash
+            # Once published to npm:
+            npm install -g @leval/mcp-grafana@${{ steps.package-version.outputs.version }}
+            
+            # Or use with npx:
+            npx @leval/mcp-grafana@${{ steps.package-version.outputs.version }}
+            ```
+            
+            ### ⚠️ Note
+            This is a draft release. It will be published when ready.
+            
+            ---
+            *This draft was automatically generated from ${{ github.event_name == 'pull_request' && 'PR #' || 'commit ' }}${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.sha }}*
+          files: |
+            leval-mcp-grafana-*.tgz

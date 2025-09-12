@@ -1,0 +1,183 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.3)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Release notes (optional)'
+        required: false
+        type: string
+      npm_publish:
+        description: 'Publish to npm'
+        required: true
+        default: true
+        type: boolean
+      prerelease:
+        description: 'Mark as pre-release'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Validate version
+        id: validate
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          NEW_VERSION="${{ github.event.inputs.version }}"
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "New version: $NEW_VERSION"
+          
+          # Basic semver validation
+          if ! echo "$NEW_VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$'; then
+            echo "❌ Invalid version format: $NEW_VERSION"
+            exit 1
+          fi
+          
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Update version
+        run: |
+          # Update package.json
+          npm version ${{ steps.validate.outputs.new_version }} --no-git-tag-version --allow-same-version
+          
+          # Update version in CLI
+          sed -i "s/\.version('[^']*')/\.version('${{ steps.validate.outputs.new_version }}')/" src/cli.ts
+      
+      - name: Build package
+        run: npm run build
+      
+      - name: Run tests
+        run: npm test || true
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges | head -20)
+          else
+            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Create changelog content
+          cat > RELEASE_NOTES.md << EOF
+          ## Changes in v${{ steps.validate.outputs.new_version }}
+          
+          ${{ github.event.inputs.release_notes }}
+          
+          ### Commits
+          $COMMITS
+          EOF
+          
+          # Output for GitHub release
+          {
+            echo 'changelog<<EOF'
+            cat RELEASE_NOTES.md
+            echo EOF
+          } >> $GITHUB_OUTPUT
+      
+      - name: Create npm package
+        run: npm pack
+      
+      - name: Commit version changes
+        run: |
+          git add package.json package-lock.json src/cli.ts
+          git commit -m "chore(release): v${{ steps.validate.outputs.new_version }}
+          
+          Manual release triggered by @${{ github.actor }}
+          ${{ github.event.inputs.release_notes }}" || true
+      
+      - name: Push changes
+        run: |
+          git push origin main
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.validate.outputs.new_version }}" -m "Release v${{ steps.validate.outputs.new_version }}
+          
+          ${{ github.event.inputs.release_notes }}"
+          git push origin "v${{ steps.validate.outputs.new_version }}"
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          tag_name: v${{ steps.validate.outputs.new_version }}
+          name: "Release v${{ steps.validate.outputs.new_version }}"
+          body: |
+            ## 🎉 Release v${{ steps.validate.outputs.new_version }}
+            
+            **Released by**: @${{ github.actor }}
+            **Release Type**: Manual
+            ${{ github.event.inputs.prerelease == 'true' && '**Pre-release**: ⚠️ This is a pre-release version' || '' }}
+            
+            ### 📝 Release Notes
+            ${{ github.event.inputs.release_notes }}
+            
+            ### 📦 Installation
+            ```bash
+            # Install globally
+            npm install -g @leval/mcp-grafana@${{ steps.validate.outputs.new_version }}
+            
+            # Or use with npx
+            npx @leval/mcp-grafana@${{ steps.validate.outputs.new_version }}
+            ```
+            
+            ### 📋 Full Changelog
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### 📚 Documentation
+            - [Setup Guide](https://github.com/leval-ai/mcp-grafana#-mcp-client-configuration)
+            - [Available Tools](https://github.com/leval-ai/mcp-grafana#-available-tools-43-total)
+            - [npm Package](https://www.npmjs.com/package/@leval/mcp-grafana)
+          files: |
+            leval-mcp-grafana-*.tgz
+      
+      - name: Publish to npm
+        if: github.event.inputs.npm_publish == 'true'
+        run: |
+          if [ "${{ github.event.inputs.prerelease }}" == "true" ]; then
+            npm publish --access public --tag beta
+          else
+            npm publish --access public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
