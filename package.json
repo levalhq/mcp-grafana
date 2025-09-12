@@ -23,6 +23,10 @@
     "type": "git",
     "url": "git+https://github.com/leval-ai/mcp-grafana.git"
   },
+  "bugs": {
+    "url": "https://github.com/leval-ai/mcp-grafana/issues"
+  },
+  "homepage": "https://github.com/leval-ai/mcp-grafana#readme",
   "keywords": [
     "mcp",
     "grafana",

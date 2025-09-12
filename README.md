@@ -3,8 +3,10 @@
 Complete TypeScript/JavaScript implementation of the Model Context Protocol (MCP) server for Grafana, enabling AI assistants to interact with Grafana dashboards, datasources, alerts, incidents, and more.
 
 [![npm version](https://img.shields.io/npm/v/@leval/mcp-grafana.svg)](https://www.npmjs.com/package/@leval/mcp-grafana)
+[![npm downloads](https://img.shields.io/npm/dm/@leval/mcp-grafana.svg)](https://www.npmjs.com/package/@leval/mcp-grafana)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![MCP](https://img.shields.io/badge/MCP-1.0-green.svg)](https://modelcontextprotocol.io)
+[![GitHub stars](https://img.shields.io/github/stars/leval-ai/mcp-grafana.svg)](https://github.com/leval-ai/mcp-grafana/stargazers)
 
 ## 🚀 Features
 
@@ -478,8 +480,24 @@ All features from the original Go implementation have been migrated:
 
 Apache-2.0 - See [LICENSE](LICENSE) file for details
 
+## 📦 NPM Package
+
+This package is published on npm as [`@leval/mcp-grafana`](https://www.npmjs.com/package/@leval/mcp-grafana)
+
+```bash
+# Install globally
+npm install -g @leval/mcp-grafana
+
+# Or use directly with npx
+npx @leval/mcp-grafana
+
+# View package info
+npm info @leval/mcp-grafana
+```
+
 ## 🆘 Support
 
+- **NPM Package**: [npmjs.com/package/@leval/mcp-grafana](https://www.npmjs.com/package/@leval/mcp-grafana)
 - **GitHub Issues**: [github.com/leval-ai/mcp-grafana/issues](https://github.com/leval-ai/mcp-grafana/issues)
 - **Documentation**: [Grafana Docs](https://grafana.com/docs)
 - **MCP Protocol**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
@@ -487,6 +505,12 @@ Apache-2.0 - See [LICENSE](LICENSE) file for details
 ## 🎉 Acknowledgments
 
 This TypeScript implementation provides full feature parity with the original Go version, with improved npm ecosystem integration and support for all major MCP clients.
+
+## 👥 Author
+
+**Leval AI** - [@leval-ai](https://github.com/leval-ai)
+
+Published as npm package: [`@leval/mcp-grafana`](https://www.npmjs.com/package/@leval/mcp-grafana)
 
 ---
 
